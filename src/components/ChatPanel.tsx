@@ -8,9 +8,13 @@ interface ChatPanelProps {
     onSendMessage: (msg: string) => void;
     onImageUpload: (file: File) => void;
     isLoading: boolean;
+    onResumeImport: (file: File) => void;
+    isImporting: boolean;
 }
 
-export const ChatPanel: React.FC<ChatPanelProps> = ({ messages, onSendMessage, onImageUpload, isLoading }) => {
+import { ImportResumeButton } from './ImportResumeButton';
+
+export const ChatPanel: React.FC<ChatPanelProps> = ({ messages, onSendMessage, onImageUpload, isLoading, onResumeImport, isImporting }) => {
     const [input, setInput] = useState('');
     const endRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -77,11 +81,12 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ messages, onSendMessage, o
                         type="button"
                         className="upload-btn"
                         onClick={() => fileInputRef.current?.click()}
-                        title="Upload Resume or Profile Picture"
-                        disabled={isLoading}
+                        title="Upload Profile Picture"
+                        disabled={isLoading || isImporting}
                     >
                         <ImageIcon size={20} />
                     </button>
+                    <ImportResumeButton onImport={onResumeImport} isLoading={isImporting} iconOnly />
                     <textarea
                         value={input}
                         onChange={(e) => {

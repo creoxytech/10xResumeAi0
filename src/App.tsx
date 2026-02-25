@@ -3,7 +3,6 @@ import { ChatPanel } from './components/ChatPanel';
 import { PreviewPanel } from './components/PreviewPanel';
 import { chatRespond, extractResumeData, extractDataFromFile } from './lib/gemini';
 import type { ChatMessage } from './lib/gemini';
-import { ImportResumeButton } from './components/ImportResumeButton';
 import { ExportButton } from './components/ExportButton';
 import { TemplateGallery } from './components/TemplateGallery';
 import { LayoutTemplateIcon, Eye, X } from 'lucide-react';
@@ -144,7 +143,9 @@ export default function App() {
           messages={messages}
           onSendMessage={handleSendMessage}
           onImageUpload={handleImageUpload}
-          isLoading={isTyping || isImporting}
+          isLoading={isTyping}
+          onResumeImport={handleResumeImport}
+          isImporting={isImporting}
         />
         <button
           className="mobile-preview-btn"
@@ -173,7 +174,6 @@ export default function App() {
             </button>
           </div>
           <div className="nav-right toolbar-actions">
-            <ImportResumeButton onImport={handleResumeImport} isLoading={isImporting} />
             <ExportButton targetRef={previewRef} fileName={`${resumeData.personalInfo.firstName || 'My'}_Resume.pdf`} />
           </div>
         </div>
