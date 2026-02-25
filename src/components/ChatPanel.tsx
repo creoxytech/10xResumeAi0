@@ -64,44 +64,47 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ messages, onSendMessage, o
                 <div ref={endRef} />
             </div>
 
-            <form className="chat-input-form" onSubmit={handleSubmit}>
-                <input
-                    type="file"
-                    accept="image/*"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    style={{ display: 'none' }}
-                />
-                <button
-                    type="button"
-                    className="upload-btn"
-                    onClick={() => fileInputRef.current?.click()}
-                    title="Upload Profile Picture"
-                    disabled={isLoading}
-                >
-                    <ImageIcon size={20} />
-                </button>
-                <textarea
-                    value={input}
-                    onChange={(e) => {
-                        setInput(e.target.value);
-                        e.target.style.height = 'auto';
-                        e.target.style.height = `${Math.min(e.target.scrollHeight, 150)}px`;
-                    }}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            handleSubmit(e);
-                        }
-                    }}
-                    placeholder="Message the AI Assistant... (Shift+Enter for new line)"
-                    disabled={isLoading}
-                    rows={1}
-                />
-                <button type="submit" disabled={!input.trim() || isLoading}>
-                    <SendIcon size={20} />
-                </button>
-            </form>
+            <div className="chat-input-wrapper">
+                <form className={`chat-input-form ${input.trim() ? 'has-text' : ''}`} onSubmit={handleSubmit}>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        style={{ display: 'none' }}
+                    />
+                    <button
+                        type="button"
+                        className="upload-btn"
+                        onClick={() => fileInputRef.current?.click()}
+                        title="Upload Resume or Profile Picture"
+                        disabled={isLoading}
+                    >
+                        <ImageIcon size={20} />
+                    </button>
+                    <textarea
+                        value={input}
+                        onChange={(e) => {
+                            setInput(e.target.value);
+                            e.target.style.height = 'auto';
+                            e.target.style.height = `${Math.min(e.target.scrollHeight, 150)}px`;
+                        }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault();
+                                handleSubmit(e);
+                            }
+                        }}
+                        placeholder="Message the AI Assistant..."
+                        disabled={isLoading}
+                        rows={1}
+                    />
+                    <button type="submit" className="send-btn" disabled={!input.trim() || isLoading}>
+                        <SendIcon size={18} />
+                    </button>
+                </form>
+                <div className="chat-footer">Build your ATS-optimised resume effortlessly. AI can make mistakes.</div>
+            </div>
         </div>
     );
 };

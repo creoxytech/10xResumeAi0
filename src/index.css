@@ -66,6 +66,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 100%;
+  position: relative;
 }
 
 .chat-header {
@@ -89,6 +90,7 @@ body {
   flex: 1;
   overflow-y: auto;
   padding: 24px;
+  padding-bottom: 140px;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -177,65 +179,122 @@ body {
   margin-bottom: 0.25rem;
 }
 
-.chat-input-form {
-  padding: 24px;
-  background: var(--bg-primary);
-  border-top: 1px solid var(--border-color);
+.chat-input-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 24px 32px;
+  background: linear-gradient(0deg, var(--bg-primary) 60%, transparent);
   display: flex;
-  gap: 12px;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
 }
 
-.chat-input-form input,
+.chat-input-form {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 28px;
+  padding: 8px 12px;
+  width: 100%;
+  max-width: 768px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.chat-input-form:focus-within {
+  border-color: var(--accent-primary);
+  box-shadow: 0 12px 48px rgba(23, 232, 193, 0.12);
+  transform: translateY(-2px);
+}
+
 .chat-input-form textarea {
   flex: 1;
-  padding: 14px 20px;
-  border-radius: 24px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  font-size: 0.95rem;
-  outline: none;
-  transition: border-color 0.2s;
-  font-family: inherit;
-}
-
-.chat-input-form textarea {
-  resize: none;
-  overflow-y: auto;
-  line-height: 1.5;
-  padding: 12px 20px;
-  max-height: 150px;
-  border-radius: 18px;
-  /* Slightly less rounded corners for multi-line */
-  scrollbar-width: thin;
-}
-
-.chat-input-form input:focus,
-.chat-input-form textarea:focus {
-  border-color: var(--accent);
-}
-
-.chat-input-form button {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: white;
   border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 1rem;
+  line-height: 1.5;
+  padding: 10px 4px;
+  max-height: 150px;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  scrollbar-width: none;
+}
+
+.chat-input-form textarea::-webkit-scrollbar {
+  display: none;
+}
+
+.upload-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, color 0.2s;
+  flex-shrink: 0;
+  margin-bottom: 2px;
 }
 
-.chat-input-form button:hover:not(:disabled) {
-  background: var(--accent-hover);
+.upload-btn:hover {
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
-.chat-input-form button:disabled {
+.send-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  background: var(--text-primary);
+  color: var(--bg-secondary);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  margin-bottom: 2px;
+}
+
+.chat-input-form.has-text .send-btn {
+  background: linear-gradient(135deg, #00c4cc, #8b3dff);
+  color: white;
+  box-shadow: 0 4px 12px rgba(139, 61, 255, 0.25);
+}
+
+.chat-input-form.has-text .send-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(139, 61, 255, 0.35);
+}
+
+.send-btn:disabled {
+  background: var(--bg-primary);
+  color: var(--text-secondary);
   opacity: 0.5;
   cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.chat-footer {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 12px;
+  text-align: center;
+  opacity: 0.6;
 }
 
 /* Resume Preview Toolkit */
@@ -1793,6 +1852,16 @@ body {
     flex-wrap: nowrap;
     overflow-x: auto;
     /* Allow scrolling if too tight */
+    /* Hide scrollbar for clean look */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+
+  .preview-top-nav::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari and Opera */
   }
 
   .hide-on-mobile {
@@ -1843,14 +1912,82 @@ body {
   }
 
   .chat-header {
-    padding: 16px;
+    padding: 12px 16px;
   }
 
   .chat-messages {
+    padding: 12px 16px;
+    padding-bottom: 160px;
+    /* Leave space for floating button and sticky input */
+  }
+
+  .chat-input-wrapper {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
     padding: 16px;
+    background: var(--bg-primary);
+    z-index: 10;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+    /* subtle shadow above input */
   }
 
   .chat-input-form {
+    border-radius: 24px;
+    transform: none !important;
+  }
+
+  .upload-btn,
+  .send-btn {
+    width: 44px;
+    height: 44px;
+    /* Minimum mobile touch target */
+  }
+
+  .gallery-trigger-btn,
+  .export-btn,
+  .import-resume-btn {
+    padding: 10px 16px;
+    /* Ensure 44px height for mobile touch targets */
+    height: 44px;
+  }
+
+  /* Template Gallery Bottom Sheet UX */
+  .template-gallery-overlay {
+    align-items: flex-end;
+    /* Align modal to bottom */
+  }
+
+  .template-gallery-modal {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    border-radius: 20px 20px 0 0;
+    /* Rounded top only */
+    border-bottom: none;
+    max-height: 85vh;
+    /* Don't cover entire screen */
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(100%);
+    }
+
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .gallery-grid {
     padding: 16px;
+    gap: 16px;
+  }
+
+  .gallery-thumbnail {
+    height: 160px;
+    /* Slightly shorter thumbnails on mobile */
   }
 }
