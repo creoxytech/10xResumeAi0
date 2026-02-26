@@ -33,7 +33,13 @@
 }
 
 body {
+  /* overflow controlled per-view: app uses hidden, landing page uses auto */
   overflow: hidden;
+}
+
+/* Landing page scroll override — full page scroll when auth page is shown */
+body:has(.landing-wrapper) {
+  overflow: auto;
 }
 
 /* App Layout */
