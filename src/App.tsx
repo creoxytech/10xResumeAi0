@@ -11,6 +11,8 @@ import type { ResumeData, TemplateId } from './types/resume';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from './supabaseClient';
 import { AuthPrompt } from './components/AuthPrompt';
+import { PaymentWall } from './components/PaymentWall';
+import { PaymentSuccess } from './components/PaymentSuccess';
 
 export default function App() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -23,6 +25,7 @@ export default function App() {
   const previewRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
   const [session, setSession] = useState<Session | null>(null);
+  const [hasPaid, setHasPaid] = useState<boolean | null>(null); // null = checking
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -33,10 +36,30 @@ export default function App() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      // Re-check payment whenever auth state changes
+      if (!session) setHasPaid(null);
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Check payment status whenever session changes
+  useEffect(() => {
+    if (!session) {
+      setHasPaid(null);
+      return;
+    }
+    const checkPayment = async () => {
+      const { data } = await supabase
+        .from('payments')
+        .select('id')
+        .eq('user_id', session.user.id)
+        .eq('status', 'paid')
+        .maybeSingle();
+      setHasPaid(!!data);
+    };
+    checkPayment();
+  }, [session]);
 
   useEffect(() => {
     if (initialized.current || !session) return;
@@ -163,8 +186,32 @@ export default function App() {
     initialized.current = false;
   };
 
+  // Route: /payment-success → always show the PaymentSuccess page
+  if (window.location.pathname === '/payment-success') {
+    return <PaymentSuccess />;
+  }
+
   if (!session) {
     return <AuthPrompt onLogin={handleGoogleLogin} />;
+  }
+
+  // Payment gate: null = still checking, false = not paid
+  if (hasPaid === null) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#070c18', color: '#64748b', fontFamily: 'Inter,sans-serif' }}>
+        Checking access...
+      </div>
+    );
+  }
+
+  if (!hasPaid) {
+    return (
+      <PaymentWall
+        userEmail={session.user.email || ''}
+        userName={session.user.user_metadata?.full_name || ''}
+        onLogout={handleLogout}
+      />
+    );
   }
 
   return (
