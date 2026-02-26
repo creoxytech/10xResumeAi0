@@ -13,6 +13,7 @@ import { supabase } from './supabaseClient';
 import { AuthPrompt } from './components/AuthPrompt';
 import { PaymentWall } from './components/PaymentWall';
 import { PaymentSuccess } from './components/PaymentSuccess';
+import { ContactPage } from './components/ContactPage';
 
 export default function App() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -186,10 +187,10 @@ export default function App() {
     initialized.current = false;
   };
 
-  // Route: /payment-success → always show the PaymentSuccess page
-  if (window.location.pathname === '/payment-success') {
-    return <PaymentSuccess />;
-  }
+  // Simple client-side routing
+  const path = window.location.pathname;
+  if (path === '/payment-success') return <PaymentSuccess />;
+  if (path === '/contact') return <ContactPage />;
 
   if (!session) {
     return <AuthPrompt onLogin={handleGoogleLogin} />;
