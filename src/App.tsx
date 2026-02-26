@@ -5,9 +5,12 @@ import { chatRespond, extractResumeData, extractDataFromFile } from './lib/gemin
 import type { ChatMessage } from './lib/gemini';
 import { ExportButton } from './components/ExportButton';
 import { TemplateGallery } from './components/TemplateGallery';
-import { LayoutTemplateIcon, Eye, X } from 'lucide-react';
+import { LayoutTemplateIcon, Eye, X, LogOut } from 'lucide-react';
 import { initialResumeData } from './types/resume';
 import type { ResumeData, TemplateId } from './types/resume';
+import type { Session } from '@supabase/supabase-js';
+import { supabase } from './supabaseClient';
+import { AuthPrompt } from './components/AuthPrompt';
 
 export default function App() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -19,9 +22,24 @@ export default function App() {
   const [isMobilePreviewOpen, setIsMobilePreviewOpen] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
+  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
-    if (initialized.current) return;
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (initialized.current || !session) return;
     initialized.current = true;
 
     const greet = async () => {
@@ -129,6 +147,26 @@ export default function App() {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin,
+      },
+    });
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setMessages([]);
+    setResumeData(initialResumeData);
+    initialized.current = false;
+  };
+
+  if (!session) {
+    return <AuthPrompt onLogin={handleGoogleLogin} />;
+  }
+
   return (
     <div
       className={`app-container ${isMobilePreviewOpen ? 'mobile-preview-open' : ''}`}
@@ -174,6 +212,13 @@ export default function App() {
             </button>
           </div>
           <div className="nav-right toolbar-actions">
+            <button
+              className="mobile-close-preview-btn"
+              onClick={handleLogout}
+              title="Sign Out"
+            >
+              <LogOut size={20} />
+            </button>
             <ExportButton targetRef={previewRef} fileName={`${resumeData.personalInfo.firstName || 'My'}_Resume.pdf`} />
           </div>
         </div>

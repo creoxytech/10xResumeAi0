@@ -55,7 +55,7 @@ Guide efficiently. Suggest strong structures. Keep responses short and focused o
 
       // In the @google/genai version, we pass 'contents' to 'generateContent'
       const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.5-flash-lite",
         contents,
         config: {
           systemInstruction,
