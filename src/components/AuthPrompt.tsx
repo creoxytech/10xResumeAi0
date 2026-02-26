@@ -329,8 +329,9 @@ export function AuthPrompt({ onLogin }: AuthPromptProps) {
                                 <h4 className="footer-heading">Company</h4>
                                 <ul>
                                     <li><a href="#">About Us</a></li>
-                                    <li><a href="#">Privacy Policy</a></li>
-                                    <li><a href="#">Terms of Service</a></li>
+                                    <li><a href="/terms">Privacy Policy</a></li>
+                                    <li><a href="/terms">Terms of Service</a></li>
+                                    <li><a href="/refund">Refund Policy</a></li>
                                     <li><a href="/contact">Contact Us</a></li>
                                 </ul>
                             </div>

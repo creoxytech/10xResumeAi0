@@ -14,6 +14,8 @@ import { AuthPrompt } from './components/AuthPrompt';
 import { PaymentWall } from './components/PaymentWall';
 import { PaymentSuccess } from './components/PaymentSuccess';
 import { ContactPage } from './components/ContactPage';
+import { TermsPage } from './components/TermsPage';
+import { RefundPage } from './components/RefundPage';
 
 export default function App() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -191,6 +193,8 @@ export default function App() {
   const path = window.location.pathname;
   if (path === '/payment-success') return <PaymentSuccess />;
   if (path === '/contact') return <ContactPage />;
+  if (path === '/terms') return <TermsPage />;
+  if (path === '/refund') return <RefundPage />;
 
   if (!session) {
     return <AuthPrompt onLogin={handleGoogleLogin} />;
